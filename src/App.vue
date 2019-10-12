@@ -1,28 +1,41 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app>
+    <v-app-bar app>
+      <v-toolbar-title class="headline text-uppercase">
+        <v-icon large>{{ icons.printer }}</v-icon>
+        pinter
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-icon>{{ icons.settings }}</v-icon>
+    </v-app-bar>
+
+    <v-content>
+      <HelloWorld />
+    </v-content>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { mdiPrinterWireless, mdiSettings } from '@mdi/js'
+
+import HelloWorld from './components/HelloWorld'
 
 export default {
-  name: 'app',
+  name: 'App',
   components: {
     HelloWorld
-  }
+  },
+  data: () => ({
+    icons: {
+      printer: mdiPrinterWireless,
+      settings: mdiSettings
+    }
+  })
 }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+html {
+  overflow: auto !important;
 }
 </style>
