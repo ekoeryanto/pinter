@@ -1,6 +1,6 @@
 'use strict'
 import { join } from 'path'
-import { app, protocol, BrowserWindow, Menu } from 'electron'
+import { app, protocol, BrowserWindow, Menu, Tray } from 'electron'
 import {
   createProtocol,
   installVueDevtools
@@ -13,6 +13,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+let quiting
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -23,12 +24,14 @@ if (!isDevelopment) {
   Menu.setApplicationMenu(null)
 }
 
+const icon = join(__static, 'icon.png')
+
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
+    icon,
     width: 800,
     height: 600,
-    icon: join(__static, 'icon.png'),
     hasShadow: true,
     autoHideMenuBar: true,
     alwaysOnTop: !isDevelopment,
@@ -37,6 +40,25 @@ function createWindow () {
       nodeIntegrationInWorker: true
     }
   })
+
+  const tray = new Tray(icon)
+
+  const trayMenu = Menu.buildFromTemplate([
+    {
+      label: 'Open',
+      click () {
+        win.show()
+      }
+    },
+    {
+      label: 'Exit',
+      click () {
+        app.quit()
+      }
+    }
+  ])
+
+  tray.setContextMenu(trayMenu)
 
   server.on('error', error => {
     win.webContents.send('server.error', error)
@@ -65,6 +87,19 @@ function createWindow () {
   win.on('closed', () => {
     win = null
   })
+
+  win.on('minimize', event => {
+    event.preventDefault()
+    win.hide()
+  })
+
+  win.on('close', event => {
+    if (!quiting) {
+      event.preventDefault()
+      win.hide()
+      event.returnValue = false
+    }
+  })
 }
 
 const appLock = app.requestSingleInstanceLock()
@@ -83,6 +118,7 @@ if (!appLock) {
   })
 
   app.on('before-quit', () => {
+    quiting = true
     server.close()
   })
 
