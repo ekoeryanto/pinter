@@ -1,24 +1,20 @@
 'use strict'
 import { join } from 'path'
 import { app, protocol, BrowserWindow, Menu, Tray } from 'electron'
-import {
-  createProtocol,
-  installVueDevtools
-} from 'vue-cli-plugin-electron-builder/lib'
+import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib'
 
-import server from './server'
+import server, { start } from './server'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+let tray
 let quiting
 
 // Scheme must be registered before the app is ready
-protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { secure: true, standard: true } }
-])
+protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
 
 if (!isDevelopment) {
   Menu.setApplicationMenu(null)
@@ -32,8 +28,9 @@ function createWindow () {
     icon,
     width: 800,
     height: 600,
-    hasShadow: true,
     autoHideMenuBar: true,
+    hasShadow: true,
+    show: isDevelopment,
     alwaysOnTop: !isDevelopment,
     webPreferences: {
       nodeIntegration: true,
@@ -41,24 +38,46 @@ function createWindow () {
     }
   })
 
-  const tray = new Tray(icon)
+  win.removeMenu()
+
+  tray = new Tray(icon)
 
   const trayMenu = Menu.buildFromTemplate([
     {
-      label: 'Open',
+      label: 'Settings',
+      id: 'settings',
       click () {
         win.show()
       }
     },
     {
-      label: 'Exit',
+      label: 'Start Server',
+      id: 'start',
       click () {
-        app.quit()
-      }
+        start()
+      },
+      enabled: true
+    },
+    {
+      label: 'Stop Server',
+      id: 'stop',
+      click () {
+        server.close()
+      },
+      enabled: false
+    },
+    {
+      label: 'Exit',
+      id: 'exit',
+      role: 'quit'
     }
   ])
 
   tray.setContextMenu(trayMenu)
+
+  tray.on('double-click', () => win.show())
+
+  tray.on('click', () => trayMenu.popup())
 
   server.on('error', error => {
     win.webContents.send('server.error', error)
@@ -66,11 +85,15 @@ function createWindow () {
 
   server.on('listening', () => {
     win.webContents.send('server.started', server.address())
+    trayMenu.getMenuItemById('stop').enabled = true
+    trayMenu.getMenuItemById('start').enabled = false
   })
 
   server.on('close', () => {
     if (win) {
       win.webContents.send('server.stoped')
+      trayMenu.getMenuItemById('stop').enabled = false
+      trayMenu.getMenuItemById('start').enabled = true
     }
   })
 
@@ -86,6 +109,7 @@ function createWindow () {
 
   win.on('closed', () => {
     win = null
+    tray = null
   })
 
   win.on('minimize', event => {

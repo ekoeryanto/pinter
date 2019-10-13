@@ -33,21 +33,19 @@ app.use(
 )
 
 app.use(
-  route.get('/printer', (ctx) => {
-    ctx.body = printer.getPrinter(
-      printer.getDefaultPrinterName()
-    )
+  route.get('/printer', ctx => {
+    ctx.body = printer.getPrinter(printer.getDefaultPrinterName())
   })
 )
 
 app.use(
-  route.get('/formats', (ctx) => {
+  route.get('/formats', ctx => {
     ctx.body = printer.getSupportedPrintFormats()
   })
 )
 
 app.use(
-  route.get('/commands', (ctx) => {
+  route.get('/commands', ctx => {
     ctx.body = printer.getSupportedJobCommands()
   })
 )
@@ -108,6 +106,11 @@ app.use(
 
 const server = http.createServer(app.callback())
 
+export function start () {
+  const { ip, port } = store.get('network')
+  server.listen(port, ip)
+}
+
 server.on('listening', () => {
   store.set('listening', server.address())
 })
@@ -116,15 +119,12 @@ server.on('close', () => {
   store.set('listening', null)
 })
 
-ipcMain.on('server.stop', (event) => {
+ipcMain.on('server.stop', event => {
   server.close(err => {
     event.reply(err ? 'server.error' : 'server.stoped', err)
   })
 })
 
-ipcMain.on('server.start', () => {
-  const { ip, port } = store.get('network')
-  server.listen(port, ip)
-})
+ipcMain.on('server.start', start)
 
 export default server
