@@ -1,5 +1,5 @@
 'use strict'
-
+import { join } from 'path'
 import { app, protocol, BrowserWindow, Menu } from 'electron'
 import {
   createProtocol,
@@ -27,10 +27,11 @@ function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     width: 800,
+    height: 600,
+    icon: join(__static, 'icon.png'),
     hasShadow: true,
     autoHideMenuBar: true,
     alwaysOnTop: !isDevelopment,
-    height: 600,
     webPreferences: {
       nodeIntegration: true,
       nodeIntegrationInWorker: true
