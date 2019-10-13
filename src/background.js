@@ -6,6 +6,8 @@ import {
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
 
+import server from './server'
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -17,15 +19,35 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
-Menu.setApplicationMenu(null)
+if (!isDevelopment) {
+  Menu.setApplicationMenu(null)
+}
 
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     width: 800,
+    hasShadow: true,
+    autoHideMenuBar: true,
+    alwaysOnTop: !isDevelopment,
     height: 600,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      nodeIntegrationInWorker: true
+    }
+  })
+
+  server.on('error', error => {
+    win.webContents.send('server.error', error)
+  })
+
+  server.on('listening', () => {
+    win.webContents.send('server.started', server.address())
+  })
+
+  server.on('close', () => {
+    if (win) {
+      win.webContents.send('server.stoped')
     }
   })
 
@@ -57,6 +79,10 @@ if (!appLock) {
       }
       win.focus()
     }
+  })
+
+  app.on('before-quit', () => {
+    server.close()
   })
 
   // Quit when all windows are closed.
