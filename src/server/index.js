@@ -14,9 +14,9 @@ app.context.store = store
 app.use(bodyParser())
 
 app.use(async (ctx, next) => {
-  // if (store.get('pin') !== ctx.get('x-pin')) {
-  //   return ctx.throw(401, null)
-  // }
+  if (store.get('pin') !== ctx.get('x-pin')) {
+    return ctx.throw(401, null)
+  }
   await next()
 })
 
@@ -89,8 +89,20 @@ app.use(
 )
 
 app.use(
-  route.post('/print', ctx => {
+  route.post('/print', async ctx => {
     ctx.body = ctx.request.body
+    printer.printDirect({
+      ...ctx.request.body,
+      success: jobId => {
+        ctx.body = {
+          printer: ctx.request.body.name || printer.getDefaultPrinterName(),
+          jobId
+        }
+      },
+      error: err => {
+        ctx.throw(503, err)
+      }
+    })
   })
 )
 
