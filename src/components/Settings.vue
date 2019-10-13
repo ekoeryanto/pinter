@@ -149,6 +149,7 @@ const ips = [].concat(...Object.values(networkInterfaces()))
 export default {
   data: () => ({
     ips,
+    pin: null,
     snackbar: {
       show: false,
       text: null,
@@ -177,14 +178,6 @@ export default {
   }),
 
   computed: {
-    pin: {
-      get () {
-        return store.get('pin')
-      },
-      set (v) {
-        store.set('pin', String(v))
-      }
-    },
     printer: {
       get () {
         return store.get('printer.default') || printer.getDefaultPrinterName()
@@ -245,6 +238,7 @@ export default {
     },
     regeneratePin (auto = true) {
       this.pin = this.generatePin()
+      store.set('pin', String(this.pin))
       if (auto) {
         this.snackbar.show = true
         this.snackbar.copy = true
@@ -260,9 +254,9 @@ export default {
     }
   },
 
-  mounted () {
+  created () {
     this.server.listening = store.get('listening')
-
+    this.pin = store.get('pin')
     ipcRenderer.on('server.error', (event, error) => {
       this.server.error = error
     })
