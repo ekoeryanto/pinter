@@ -33,7 +33,7 @@
               ></v-select>
 
               <v-select
-                v-if="paper"
+                v-if="pageSizes"
                 label="Paper"
                 v-model="paper"
                 item-value="name"
@@ -44,6 +44,7 @@
               ></v-select>
 
               <v-select
+                v-if="formats"
                 label="Format"
                 v-model="format"
                 :items="formats"
@@ -158,6 +159,7 @@ export default {
       error: null
     },
     printers: printer.getPrinters(),
+    pageSizes: null,
     formats: null,
     icons: {
       close: mdiClose,
@@ -222,16 +224,6 @@ export default {
       set (v) {
         store.set('network.port', v)
       }
-    },
-    driverOptions () {
-      return printer.getPrinterDriverOptions(this.printer)
-    },
-    pageSizes () {
-      if (!this.driverOptions) {
-        return []
-      }
-      const sizes = this.driverOptions.PageSize
-      return Object.keys(sizes).map(x => ({ name: x, disabled: !sizes[x] }))
     }
   },
 
@@ -286,6 +278,9 @@ export default {
 
     if (process.platform !== 'win32') {
       this.formats = printer.getSupportedPrintFormats()
+      const driverOptions = printer.getPrinterDriverOptions()
+      const sizes = driverOptions.PageSize
+      this.pageSizes = Object.keys(sizes).map(x => ({ name: x, disabled: !sizes[x] }))
     }
 
     if (!this.pin) this.regeneratePin(false)
