@@ -4,14 +4,16 @@ module.exports = {
   ],
   pluginOptions: {
     electronBuilder: {
+      mainProcessWatch: ['./src/server/'],
       builderOptions: {
         appId: 'app.pake.pinter',
         productName: 'Pinter',
         directories: {
           buildResources: 'res'
         },
-        mainProcessWatch: ['./src/server/']
-        // options placed here will be merged with default configuration and passed to electron-builder
+        win: {
+          icon: 'icons/png'
+        }
       }
     }
   }
