@@ -1,7 +1,12 @@
 {
   "name": "pinter",
+  "displayName": "Pinter",
   "version": "0.1.0",
-  "private": true,
+  "license": "MIT",
+  "author": "Eko Eryanto <ekoeryanto@gmail.com>",
+  "homepage": "https://github.com/ekoeryanto/pinter#readme",
+  "repository": "github:ekoeryanto/pinter",
+  "main": "background.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -11,7 +16,6 @@
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
   },
-  "main": "background.js",
   "dependencies": {
     "@pake/node-printer": "^0.5.2",
     "body-parser": "^1.19.0",
