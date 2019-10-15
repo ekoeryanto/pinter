@@ -1,24 +1,14 @@
 <template>
-  <v-container
-    class="fill-height"
-    fluid
-  >
-    <v-row
-      align="center"
-      justify="center"
-    >
-      <v-col
-        cols="12"
-        sm="8"
-        md="6"
-      >
+  <v-container class="fill-height" fluid>
+    <v-row align="center" justify="center">
+      <v-col cols="12" sm="8" md="6">
         <v-card class="elevation-12">
           <v-toolbar flat>
             <v-toolbar-title>Pinter Settings</v-toolbar-title>
             <div class="flex-grow-1"></div>
-            <div v-if="server.listening">
-              http://{{server.listening.address}}:{{server.listening.port}}
-            </div>
+            <div
+              v-if="server.listening"
+            >http://{{server.listening.address}}:{{server.listening.port}}</div>
           </v-toolbar>
           <v-divider></v-divider>
           <v-card-text>
@@ -87,50 +77,30 @@
           </v-card-text>
           <v-card-actions>
             <div v-if="server.listening">
-              <v-icon color="success">{{icons.check}}</v-icon>
-              Server started.
+              <v-icon color="success">{{icons.check}}</v-icon>Server started.
             </div>
             <div v-else-if="server.error">
               <v-icon color="error">{{icons.close}}</v-icon>
               {{ server.error.message || server.error.code || server.error }}.
             </div>
             <div v-else>
-              <v-icon color="error">{{icons.close}}</v-icon>
-              Server stoped.
+              <v-icon color="error">{{icons.close}}</v-icon>Server stoped.
             </div>
             <v-spacer></v-spacer>
             <v-btn
               color="green"
               text
-              @click="startServer"
+              @click="startServer(true)"
             >{{server.listening ? 'Restart' : 'Start'}}</v-btn>
-            <v-btn
-              color="red"
-              text
-              :disabled="!server.listening"
-              @click="stopServer"
-            >Stop</v-btn>
+            <v-btn color="red" text :disabled="!server.listening" @click="stopServer">Stop</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
     <v-snackbar v-model="snackbar.show">
       {{ snackbar.message }}
-      <v-btn
-        v-if="snackbar.copy"
-        :color="snackbar.color || 'warning'"
-        text
-        @click="copyPin"
-      >
-        COPY
-      </v-btn>
-      <v-btn
-        :color="snackbar.color || 'warning'"
-        text
-        @click="snackbar.show = false"
-      >
-        OK
-      </v-btn>
+      <v-btn v-if="snackbar.copy" :color="snackbar.color || 'warning'" text @click="copyPin">COPY</v-btn>
+      <v-btn :color="snackbar.color || 'warning'" text @click="snackbar.show = false">OK</v-btn>
     </v-snackbar>
   </v-container>
 </template>
@@ -138,11 +108,23 @@
 <script>
 import { networkInterfaces } from 'os'
 import { ipcRenderer } from 'electron'
-import { mdiCheck, mdiClose, mdiPrinter, mdiFileDocument, mdiProtocol, mdiLock, mdiMidiPort, mdiRefresh, mdiEye, mdiEyeOff } from '@mdi/js'
+import {
+  mdiCheck,
+  mdiClose,
+  mdiPrinter,
+  mdiFileDocument,
+  mdiProtocol,
+  mdiLock,
+  mdiMidiPort,
+  mdiRefresh,
+  mdiEye,
+  mdiEyeOff
+} from '@mdi/js'
 import printer from '@pake/node-printer'
 import store from '../server/store'
 
-const ips = [].concat(...Object.values(networkInterfaces()))
+const ips = []
+  .concat(...Object.values(networkInterfaces()))
   .filter(x => x.family === 'IPv4')
   .concat('0.0.0.0')
 
@@ -188,7 +170,10 @@ export default {
     },
     paper: {
       get () {
-        return store.get('printer.paper') || printer.getSelectedPaperSize(this.printer)
+        return (
+          store.get('printer.paper') ||
+          printer.getSelectedPaperSize(this.printer)
+        )
       },
       set (v) {
         store.set('printer.paper', v)
@@ -223,10 +208,13 @@ export default {
   methods: {
     startServer (force = false) {
       if (this.server.listening) {
-        ipcRenderer.send('server.stop')
+        if (force) {
+          this.stopServer()
+        }
+        ipcRenderer.send('server.start')
+      } else {
+        ipcRenderer.send('server.start')
       }
-
-      ipcRenderer.send('server.start')
     },
     stopServer () {
       ipcRenderer.send('server.stop')
@@ -274,13 +262,16 @@ export default {
       this.formats = printer.getSupportedPrintFormats()
       const driverOptions = printer.getPrinterDriverOptions()
       const sizes = driverOptions.PageSize
-      this.pageSizes = Object.keys(sizes).map(x => ({ name: x, disabled: !sizes[x] }))
+      this.pageSizes = Object.keys(sizes).map(x => ({
+        name: x,
+        disabled: !sizes[x]
+      }))
     }
 
     if (!this.pin) this.regeneratePin(false)
   },
   mounted () {
-    this.startServer()
+    this.startServer(process.env.NODE_ENV === 'development')
   }
 }
 </script>
