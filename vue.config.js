@@ -14,9 +14,6 @@ module.exports = {
         directories: {
           buildResources: 'res'
         },
-        nsis: {
-          artifactName: '${name}-${version}-bundle.${ext}'
-        },
         nsisWeb: {
           artifactName: '${name}-${version}-${arch}.${ext}'
         },
@@ -31,10 +28,6 @@ module.exports = {
           target: [
             {
               target: 'nsis-web',
-              arch: ['ia32', 'x64']
-            },
-            {
-              target: 'nsis',
               arch: ['ia32', 'x64']
             }
           ]
