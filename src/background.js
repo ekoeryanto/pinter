@@ -3,7 +3,7 @@ import { join } from 'path'
 import { app, protocol, BrowserWindow, Menu, Tray } from 'electron'
 import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib'
 
-import server, { start } from './server'
+import { server, start } from './server'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 

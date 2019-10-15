@@ -14,11 +14,10 @@
   "main": "background.js",
   "dependencies": {
     "@pake/node-printer": "^0.5.2",
+    "body-parser": "^1.19.0",
     "core-js": "^2.6.5",
     "electron-store": "^5.0.0",
-    "koa": "^2.10.0",
-    "koa-bodyparser": "^4.2.1",
-    "koa-route": "^3.2.0",
+    "polka": "^0.5.2",
     "vue": "^2.6.10",
     "vuetify": "^2.1.0"
   },

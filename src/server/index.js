@@ -1,110 +1,98 @@
 import http from 'http'
-import Koa from 'koa'
-import route from 'koa-route'
-import bodyParser from 'koa-bodyparser'
 import printer from '@pake/node-printer'
 import { ipcMain } from 'electron'
+import Polka from 'polka'
+import { json } from 'body-parser'
 
 import store from './store'
 
-const app = new Koa()
+export const folka = Polka()
 
-app.context.store = store
-
-app.use(bodyParser())
-
-app.use(async (ctx, next) => {
-  if (store.get('pin') !== ctx.get('x-pin')) {
-    return ctx.throw(401, null)
+function authenticate (req, res, next) {
+  const pin = store.get('pin')
+  if (pin !== req.headers['x-pin']) {
+    res.writeHead(401, {
+      'Content-Type': 'application/json'
+    })
+    res.end(
+      JSON.stringify({
+        status: 401,
+        error: 'Unauthorized',
+        message: 'You are not allowed to use the service'
+      })
+    )
   }
-  await next()
-})
 
-app.use(
-  route.get('/printers', ctx => {
-    ctx.body = printer.getPrinters()
+  req.PIN = pin
+
+  next()
+}
+
+folka
+  .use(json(), authenticate)
+  .get('/printers', (req, res) => {
+    res.json(printer.getPrinters())
   })
-)
-
-app.use(
-  route.get('/printer/:name', (ctx, name) => {
-    ctx.body = printer.getPrinter(name)
+  .get('/printer/:name', (req, res) => {
+    res.json(printer.getPrinter(req.params.name))
   })
-)
-
-app.use(
-  route.get('/printer', ctx => {
-    ctx.body = printer.getPrinter(printer.getDefaultPrinterName())
+  .get('/printer', (req, res) => {
+    res.json(printer.getPrinter(printer.getDefaultPrinterName()))
   })
-)
-
-app.use(
-  route.get('/formats', ctx => {
-    ctx.body = printer.getSupportedPrintFormats()
+  .get('/formats', (req, res) => {
+    res.json(printer.getSupportedPrintFormats())
   })
-)
-
-app.use(
-  route.get('/commands', ctx => {
-    ctx.body = printer.getSupportedJobCommands()
+  .get('/commands', (req, res) => {
+    res.json(printer.getSupportedJobCommands())
   })
-)
-
-app.use(
-  route.get('/job/:name/:id', (ctx, name, id) => {
-    ctx.body = printer.getJob(name, id)
+  .get('/job/:name/:id', (req, res) => {
+    res.json(printer.getJob(req.params.name, req.params.id))
   })
-)
-
-app.use(
-  route.post('/job/:name/:id', (ctx, name, id) => {
-    const { command } = ctx.request.body
+  .post('/job/:name/:id', (req, res) => {
+    const { command } = req.body
+    const { name, id } = req.params
     const success = printer.setJob(name, id, command)
-    ctx.body = {
+    res.json({
       name,
       id,
       command,
       success
-    }
+    })
   })
-)
-
-app.use(
-  route.del('/job/:name/:id', (ctx, name, id) => {
+  .delete('/job/:name/:id', (req, res) => {
+    const { name, id } = req.params
     const success = printer.setJob(name, id, 'CANCEL')
-    ctx.body = {
+    res.json({
       name,
       id,
       success
-    }
+    })
   })
-)
-
-app.use(
-  route.get('/options/:name', (ctx, name) => {
-    ctx.body = printer.getPrinterDriverOptions(name)
+  .get('/options/:name', (req, res) => {
+    res.json(printer.getPrinterDriverOptions(req.params.name))
   })
-)
-
-app.use(
-  route.post('/print', async ctx => {
-    ctx.body = ctx.request.body
+  .post('/print', (req, res) => {
     printer.printDirect({
-      ...ctx.request.body,
+      ...req.body,
       success: jobId => {
-        ctx.body = {
-          printer: ctx.request.body.name || printer.getDefaultPrinterName(),
+        res.json({
+          printer: req.body.name || printer.getDefaultPrinterName(),
           jobId
-        }
+        })
       },
       error: err => {
-        ctx.throw(503, err)
+        const code = 400
+        res.status(code)
+          .json({
+            status: code,
+            error: 'BadRequest',
+            message: err.message
+          })
       }
     })
   })
-)
 
-const server = http.createServer(app.callback())
+export const server = http.createServer(folka.handler)
 
 export function start () {
   const { ip, port } = store.get('network')
@@ -126,5 +114,3 @@ ipcMain.on('server.stop', event => {
 })
 
 ipcMain.on('server.start', start)
-
-export default server

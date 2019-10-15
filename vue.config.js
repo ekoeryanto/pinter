@@ -5,6 +5,7 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       mainProcessWatch: ['./src/server/'],
+      externals: ['polka'],
       builderOptions: {
         appId: 'app.pake.pinter',
         productName: 'Pinter',
