@@ -138,19 +138,8 @@ server.on('close', () => {
   store.set('listening', null)
 })
 
-ipcMain.on('server.stop', async event => {
-  try {
-    await new Promise((resolve, reject) => {
-      server.close(err => {
-        if (err) reject(err)
-        else resolve()
-      })
-    })
-    event.reply('server.stoped')
-  } catch (error) {
-    event.reply('server.error', error)
-  }
-  polka.close(err => {
+ipcMain.on('server.stop', event => {
+  server.close(err => {
     event.reply(err ? 'server.error' : 'server.stoped', err)
   })
 })
