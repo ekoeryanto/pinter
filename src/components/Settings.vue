@@ -278,6 +278,9 @@ export default {
     }
 
     if (!this.pin) this.regeneratePin(false)
+  },
+  mounted () {
+    this.startServer()
   }
 }
 </script>
