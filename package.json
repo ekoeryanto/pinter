@@ -1,6 +1,7 @@
 {
   "name": "pinter",
   "displayName": "Pinter",
+  "description": "Printer server for web applications.",
   "version": "0.1.0-alpha.1",
   "license": "MIT",
   "author": "Eko Eryanto <ekoeryanto@gmail.com>",
