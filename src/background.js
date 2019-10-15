@@ -2,6 +2,7 @@
 import { join } from 'path'
 import { app, protocol, BrowserWindow, Menu, Tray } from 'electron'
 import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib'
+import { autoUpdater } from 'electron-updater'
 
 import { server, start } from './server'
 
@@ -105,6 +106,7 @@ function createWindow () {
     createProtocol('app')
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
+    autoUpdater.checkForUpdatesAndNotify()
   }
 
   win.on('closed', () => {
