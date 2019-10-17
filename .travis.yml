@@ -1,17 +1,12 @@
-sudo: required
 os: osx
 osx_image: xcode10.2
 language: node_js
 node_js: "10.16.3"
-compiler: clang
 osx_image: xcode10.2
 
 env:
   global:
     - JOBS=4
-    - CXX=clang++
-    - CC=clang
-    - npm_config_clang=1
     - ELECTRON_CACHE=$HOME/.cache/electron
     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
