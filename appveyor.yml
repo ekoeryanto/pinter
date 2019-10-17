@@ -19,4 +19,4 @@ test_script:
   - npm --version
 
 build_script:
-  - npm run electron:build -- -w
+  - npm run electron:build -- -w --ia32 --x64
