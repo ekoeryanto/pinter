@@ -1,0 +1,30 @@
+sudo: false
+
+language: node_js
+node_js: "10.16.3"
+
+cache:
+  directories:
+    - $HOME/.cache/electron
+    - $HOME/.cache/electron-builder
+    - $HOME/.npm/_prebuilds
+
+env:
+  global:
+    - ELECTRON_CACHE=$HOME/.cache/electron
+    - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+
+jobs:
+  include:
+    - stage: Deploy Windows & Mac
+      os: osx
+      osx_image: xcode10.2
+      script:
+        - npm run electron:build -- -wm
+      before_cache:
+        - rm -rf $HOME/.cache/electron-builder/wine
+    - stage: Deploy linux
+      os: linux
+      dist: trusty
+      script:
+        - npm electron:build -- -l
