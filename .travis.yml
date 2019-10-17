@@ -1,14 +1,10 @@
-sudo: true
-compiler: clang
-
+sudo: required
+os: osx
+osx_image: xcode10.2
 language: node_js
 node_js: "10.16.3"
-
-cache:
-  directories:
-    - $HOME/.cache/electron
-    - $HOME/.cache/electron-builder
-    - $HOME/.npm/_prebuilds
+compiler: clang
+osx_image: xcode10.2
 
 env:
   global:
@@ -19,17 +15,17 @@ env:
     - ELECTRON_CACHE=$HOME/.cache/electron
     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
-jobs:
-  include:
-    - stage: Deploy Windows & Mac
-      os: osx
-      osx_image: xcode10.2
-      script:
-        - npm run electron:build -- -wm
-      before_cache:
-        - rm -rf $HOME/.cache/electron-builder/wine
-    - stage: Deploy linux
-      os: linux
-      dist: xenial
-      script:
-        - npm electron:build -- -l
+before_cache:
+  - rm -rf $HOME/.cache/electron-builder/wine
+
+cache:
+  directories:
+    - $HOME/.cache/electron
+    - $HOME/.cache/electron-builder
+    - $HOME/.npm/_prebuilds
+
+before_script:
+  - brew install rpm
+
+script:
+  - npm run electron:build -- -wml
