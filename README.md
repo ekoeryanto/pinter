@@ -1,24 +1,28 @@
-# pinter
+# Pinter
 
-## Project setup
-```
-npm install
-```
+A printers server for web applications.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Endpoint API
 
-### Compiles and minifies for production
-```
-npm run build
-```
+### Printers List
 
-### Lints and fixes files
-```
-npm run lint
+```js
+const { data } = await  fetch('http://127.0.0.1:4125/printers', {
+  headers: {
+    'X-PIN': '123456'
+  }
+})
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Print Data
+
+```js
+const { data } = await fetch('http://127.0.0.1:4125/print', {
+  method: 'POST',
+  headers: {
+    'X-PIN': '123456'
+  }
+})
+```
+
+> See `src/server/index.js` for more.
