@@ -19,8 +19,10 @@ cache:
     - $HOME/.cache/electron-builder
     - $HOME/.npm/_prebuilds
 
-before_script:
-  - brew install rpm
-
 script:
   - npm run electron:build -- -wml
+
+addons:
+  homebrew:
+    packages:
+    - rpm
