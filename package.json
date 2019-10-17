@@ -1,13 +1,8 @@
 {
   "name": "pinter",
-  "displayName": "Pinter",
-  "description": "Printer server for web applications.",
   "version": "0.1.0-alpha.1",
-  "license": "MIT",
+  "description": "Printer server for web applications.",
   "author": "Eko Eryanto <ekoeryanto@gmail.com>",
-  "homepage": "https://github.com/ekoeryanto/pinter#readme",
-  "repository": "github:ekoeryanto/pinter",
-  "main": "background.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -17,10 +12,11 @@
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
   },
+  "main": "background.js",
   "dependencies": {
     "@pake/node-printer": "^0.5.4",
     "body-parser": "^1.19.0",
-    "core-js": "^2.6.5",
+    "core-js": "^3.1.2",
     "electron-store": "^5.0.0",
     "electron-updater": "^4.1.2",
     "polka": "^0.5.2",
@@ -29,9 +25,9 @@
   },
   "devDependencies": {
     "@mdi/js": "^4.5.95",
-    "@vue/cli-plugin-babel": "^3.12.0",
-    "@vue/cli-plugin-eslint": "^3.12.0",
-    "@vue/cli-service": "^3.12.0",
+    "@vue/cli-plugin-babel": "^4.0.0",
+    "@vue/cli-plugin-eslint": "^4.0.1",
+    "@vue/cli-service": "^4.0.0",
     "@vue/eslint-config-standard": "^4.0.0",
     "babel-eslint": "^10.0.1",
     "electron": "^5.0.0",
@@ -45,13 +41,17 @@
     "vue-template-compiler": "^2.6.10",
     "vuetify-loader": "^1.2.2"
   },
+  "displayName": "Pinter",
   "gitHooks": {
     "pre-commit": "lint-staged"
   },
+  "homepage": "https://github.com/ekoeryanto/pinter#readme",
+  "license": "MIT",
   "lint-staged": {
     "*.{js,vue}": [
       "vue-cli-service lint",
       "git add"
     ]
-  }
+  },
+  "repository": "github:ekoeryanto/pinter"
 }
