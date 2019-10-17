@@ -1,0 +1,22 @@
+image: Visual Studio 2017
+platform: x64
+
+environment:
+  GH_TOKEN:
+    secure: NQDJX0Y3B///tmIdqc7cQr5bID4AWHlDVivFxmRoNH8/UB8Cb4gNv2lN35XJFEaq
+
+cache:
+  - '%LOCALAPPDATA%\electron\Cache'
+  - '%LOCALAPPDATA%\electron-builder\cache'
+  - '%APPDATA%\npm-cache'
+
+install:
+  - ps: Install-Product node 10 $env:PLATFORM
+  - cmd: npm ci
+
+test_script:
+  - node --version
+  - npm --version
+
+build_script:
+  - npm run electron:build -- -w
