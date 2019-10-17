@@ -24,7 +24,6 @@ module.exports = {
           depends: ['gconf2', 'gconf-service', 'libnotify4', 'libappindicator1', 'libxtst6', 'libnss3', 'libcups2-dev']
         },
         win: {
-          icon: 'icons/png',
           target: [
             {
               target: 'nsis-web',
@@ -33,7 +32,6 @@ module.exports = {
           ]
         },
         linux: {
-          icon: 'icons/png',
           category: 'Business',
           target: [
             {
