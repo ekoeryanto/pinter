@@ -19,7 +19,7 @@ cache:
     - $HOME/.npm/_prebuilds
 
 script:
-  - npm run electron:build -- -wml
+  - npm run electron:build -- -wml --ia32 --x64
 
 addons:
   homebrew:
