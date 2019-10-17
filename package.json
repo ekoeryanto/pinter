@@ -1,6 +1,6 @@
 {
   "name": "pinter",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": "Printer server for web applications.",
   "author": "Eko Eryanto <ekoeryanto@gmail.com>",
   "scripts": {
