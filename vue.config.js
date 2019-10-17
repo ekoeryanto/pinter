@@ -35,12 +35,10 @@ module.exports = {
           category: 'Business',
           target: [
             {
-              target: 'deb',
-              arch: ['ia32', 'x64']
+              target: 'deb'
             },
             {
-              target: 'rpm',
-              arch: ['ia32', 'x64']
+              target: 'rpm'
             }
           ]
         }
