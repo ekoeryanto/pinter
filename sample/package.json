@@ -13,7 +13,7 @@
     "parcel-bundler": "^1.12.4"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
+    "escpos-print": "^2.0.0",
     "pdfmake": "^0.1.60"
   }
 }

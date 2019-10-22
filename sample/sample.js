@@ -1,16 +1,23 @@
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
+import printReceipt from './receipt'
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
-fetch('http://127.0.0.1:4125/printers', {
+const ADDRESS = 'http://127.0.0.1:4125'
+const PIN = '275251'
+
+fetch(`${ADDRESS}/printers`, {
   method: 'GET',
   headers: {
-    'X-Pin': '551550'
+    'X-Pin': PIN
   }
 })
   .then(res => res.json())
   .then(printers => {
+    if (!printers) return
+
     const printerContainer = document.getElementById('printers')
     const list = document.createElement('ol')
     printers.forEach(p => {
@@ -24,36 +31,45 @@ fetch('http://127.0.0.1:4125/printers', {
     printerContainer.prepend(h3)
   })
 
+const receiptBtn = document.getElementById('receiptBtn')
+
+receiptBtn.addEventListener('click', e => {
+  e.preventDefault()
+  printReceipt(ADDRESS, PIN)
+})
+
 const pdfBtn = document.getElementById('pdfBtn')
 pdfBtn.addEventListener('click', e => {
   e.preventDefault()
 
-  pdfMake.createPdf({
-    content: [
-      'First paragraph',
-      'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
-    ]
-  }).getBase64(data => {
-    fetch('http://127.0.0.1:4125/print', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-PIN': '551550'
-      },
-      body: JSON.stringify({
-        type: 'PDF',
-        data,
-        decoder: 'base64'
-      })
+  pdfMake
+    .createPdf({
+      content: [
+        'First paragraph',
+        'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
+      ]
     })
-      .then(res => res.json())
-      .then(json => {
-        console.log(json)
+    .getBase64(data => {
+      fetch(`${ADDRESS}/print`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-PIN': PIN
+        },
+        body: JSON.stringify({
+          type: 'PDF',
+          data,
+          decoder: 'base64'
+        })
       })
-      .catch(error => {
-        console.warn(error)
-      })
-  })
+        .then(res => res.json())
+        .then(json => {
+          console.log(json)
+        })
+        .catch(error => {
+          console.warn(error)
+        })
+    })
 
   console.log('Print PDF created by PDFMake')
 })
