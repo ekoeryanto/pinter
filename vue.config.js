@@ -8,6 +8,7 @@ module.exports = {
       mainProcessWatch: ['./src/server/'],
       externals: ['polka'],
       builderOptions: {
+        asarUnpack: ['SumatraPDF.exe'],
         appId: 'app.pake.pinter',
         productName: 'Pinter',
         publish: ['github'],
