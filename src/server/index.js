@@ -1,25 +1,21 @@
 import http from 'http'
+import cors from 'cors'
 import printer from '@pake/node-printer'
 import { ipcMain } from 'electron'
 import Polka from 'polka'
 import { json } from 'body-parser'
 
+import { sendJSON } from '../utils'
+import pirntHandler from './services/print'
+
 import store from './store'
 
 export const polka = Polka()
 
-function sendJSON (res, data, code = 200, headers = {}) {
-  res.writeHead(code, {
-    'Content-Type': 'application/json',
-    ...headers
-  })
-  res.end(JSON.stringify(data))
-}
-
 function authenticate (req, res, next) {
   const pin = req.headers['x-pin']
   if (pin !== store.get('pin')) {
-    sendJSON(
+    return sendJSON(
       res,
       {
         status: 'fail',
@@ -34,7 +30,7 @@ function authenticate (req, res, next) {
 }
 
 polka
-  .use(json(), authenticate)
+  .use(cors(), json(), authenticate)
   .get('/printers', (req, res) => {
     sendJSON(res, printer.getPrinters())
   })
@@ -96,32 +92,7 @@ polka
       sendJSON(res, { status: 'fail', error: 'BadRequest', message: error.toString() }, 400)
     }
   })
-  .post('/print', (req, res) => {
-    printer.printDirect({
-      ...req.body,
-      success: jobId => {
-        sendJSON(
-          res,
-          {
-            printer: req.body.printer || printer.getDefaultPrinterName(),
-            jobId
-          },
-          201
-        )
-      },
-      error: err => {
-        sendJSON(
-          res,
-          {
-            status: 'fail',
-            error: 'BadRequest',
-            message: err.message
-          },
-          400
-        )
-      }
-    })
-  })
+  .post('/print', pirntHandler)
 
 export const server = http.createServer(polka.handler)
 
