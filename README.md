@@ -51,3 +51,7 @@ npm start
 4. Navigate to http://localhost:1234
 
 > You may be need virtual printer if you don't have physical device. Fortunately there is [Two Pilots Virtual Printer ](https://www.colorpilot.com/emfprinter_versions.html) for windows and Cups PDF for linux
+
+## Playgroud
+
+Comming soon
